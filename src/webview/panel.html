@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src https: data:; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline';">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuarterBeck Issues</title>
+  <style>
+    body { font-family: sans-serif; padding: 12px; }
+    .issue { border: 1px solid #ddd; padding: 8px; margin-bottom: 8px; border-radius: 6px; }
+    .actions { margin-top: 8px; }
+    button { margin-right: 6px; }
+  </style>
+</head>
+<body>
+  <h2>QuarterBeck — Issues</h2>
+  <div id="issues">Loading issues…</div>
+  <script>
+    const vscode = acquireVsCodeApi();
+    function fetchIssues(){
+      vscode.postMessage({ command: 'fetchIssues' });
+    }
+    window.addEventListener('message', event => {
+      const msg = event.data;
+      if (msg.command === 'issues') renderIssues(msg.issues);
+      if (msg.command === 'sessionStarted') alert('Session started: ' + msg.session.id);
+      if (msg.command === 'sessionFinished') alert('Session finished: ' + msg.session.id);
+      if (msg.command === 'error') alert('Error: ' + msg.message);
+    });
+    function renderIssues(issues){
+      const el = document.getElementById('issues');
+      if (!issues || issues.length === 0) { el.innerHTML = '<div>No issues found. Configure Jira/Monday tokens in settings or create some test issues.</div>'; return; }
+      el.innerHTML = '';
+      issues.forEach(issue => {
+        const d = document.createElement('div'); d.className='issue';
+        d.innerHTML = `<strong>${issue.key || issue.id || issue.title}</strong><div>${issue.summary || issue.text || issue.description || ''}</div>`;
+        const actions = document.createElement('div'); actions.className='actions';
+        const start = document.createElement('button'); start.textContent = 'Start Chat'; start.onclick = () => vscode.postMessage({ command: 'startChat', issue });
+        const finish = document.createElement('button'); finish.textContent = 'Finish Session'; finish.onclick = () => {
+          const id = prompt('Enter session id to finish (for MVP the session id is returned on start).');
+          if (id) vscode.postMessage({ command: 'finishSession', sessionId: id });
+        };
+        actions.appendChild(start); actions.appendChild(finish);
+        d.appendChild(actions);
+        el.appendChild(d);
+      })
+    }
+    // initial fetch
+    fetchIssues();
+  </script>
+</body>
+</html>
