@@ -1,0 +1,55 @@
+{
+  "name": "quarterbeck",
+  "displayName": "QuarterBeck",
+  "description": "VS Code extension - integrates Jira and Monday issues and wires up to Copilot Chat (MVP).",
+  "version": "0.1.0",
+  "publisher": "joepall",
+  "engines": { "vscode": "^1.70.0" },
+  "categories": ["Other"],
+  "activationEvents": [
+    "onCommand:quarterbeck.openIssuesPanel",
+    "onCommand:quarterbeck.createPRFromSession"
+  ],
+  "main": "extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "quarterbeck.openIssuesPanel",
+        "title": "QuarterBeck: Open Issues Panel"
+      },
+      {
+        "command": "quarterbeck.createPRFromSession",
+        "title": "QuarterBeck: Create PR from Session"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "QuarterBeck",
+      "properties": {
+        "quarterbeck.jira.apiToken": {
+          "type": "string",
+          "description": "Jira API token"
+        },
+        "quarterbeck.jira.baseUrl": {
+          "type": "string",
+          "description": "Jira base URL (https://your-domain.atlassian.net)"
+        },
+        "quarterbeck.monday.apiToken": {
+          "type": "string",
+          "description": "Monday.com API token"
+        },
+        "quarterbeck.copilot.commandPriority": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [
+            "github.copilot-chat.start",
+            "github.copilot-chat.open",
+            "github.copilot.chat.open",
+            "github.copilot.openChat"
+          ],
+          "description": "Command names to try (in order) to open Copilot Chat if installed. Adjust if your Copilot Chat command differs."
+        }
+      }
+    }
+  }
+}
